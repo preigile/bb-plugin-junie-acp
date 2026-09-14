@@ -1,0 +1,7 @@
+{
+  "id": "junie",
+  "displayName": "Junie",
+  "command": "junie",
+  "args": ["--acp", "true"],
+  "env": {}
+}
