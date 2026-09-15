@@ -1,6 +1,6 @@
 {
   "name": "bb-plugin-junie-acp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adds JetBrains Junie CLI to bb as an ACP coding-agent provider.",
   "license": "MIT",
   "type": "module",

@@ -5,15 +5,17 @@ Adds [JetBrains Junie](https://junie.jetbrains.com/) CLI to [bb](https://getbb.a
 After installation, **Junie** appears in bb as provider **`acp-junie`**.
 
 The npm package is `bb-plugin-junie-acp` and the plugin id is `junie`. The plugin
-locates the `junie` CLI and drives it in its native ACP mode (`junie --acp true`)
+locates the `junie` CLI and drives it in its native ACP mode (`junie --acp=true`)
 over stdio, registering a managed entry in bb's built-in ACP providers plugin
-without disturbing other agents.
+without disturbing other agents. The launch command matches the JetBrains entry
+in the [ACP registry](https://github.com/agentclientprotocol/registry/blob/main/junie/agent.json).
 
 ## Prerequisites
 
 - bb 0.40 or newer with its built-in ACP providers plugin enabled.
 - Install Junie with `curl -fsSL https://junie.jetbrains.com/install.sh | bash`,
-  then authenticate it as documented at <https://junie.jetbrains.com/>.
+  then authenticate it as documented at
+  <https://junie.jetbrains.com/docs/get-started-with-junie.html>.
 
 ## Build the bundle first
 
@@ -43,7 +45,7 @@ bb plugin install .
 
 The plugin locates the CLI and writes or repairs its managed entry in the ACP
 providers plugin's `customAgents` setting without disturbing other agents. It
-uses `junie --acp true` over stdio. Model ids come from Junie's ACP session
+uses `junie --acp=true` over stdio. Model ids come from Junie's ACP session
 catalog.
 
 ## Skills
@@ -100,8 +102,9 @@ the provider-specific launch profile in that plugin's `customAgents` setting
 removed in 0.41). Authentication and model availability remain owned by the
 Junie CLI and the user's JetBrains account.
 
-The package ID is `junie`; the provider ID is `acp-junie`. The compact icon is a
-`currentColor` mask so it follows the bb theme.
+The package ID is `junie`; the provider ID is `acp-junie`. The icon is the
+official Junie mark from
+[junie-agent/junie-assets](https://github.com/junie-agent/junie-assets).
 
 ## Development
 

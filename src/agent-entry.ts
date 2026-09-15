@@ -8,8 +8,10 @@ export const PROFILE = {
   providerId: "acp-junie",
   displayName: "Junie",
   binary: "junie",
-  // Junie's ACP mode is launched with `junie --acp true` over stdio.
-  args: ["--acp", "true"],
+  // Junie's ACP mode is launched with `junie --acp=true` over stdio
+  // (matching the JetBrains entry in the ACP registry:
+  // https://github.com/agentclientprotocol/registry/blob/main/junie/agent.json).
+  args: ["--acp=true"],
   // The skill directories the Junie CLI reads, so bb lists them in the composer
   // beside its own. Project roots resolve from the workspace, user roots from
   // the home directory.
@@ -24,7 +26,7 @@ export const PROFILE = {
     full: [] as string[],
     workspaceWrite: [] as string[],
   },
-  installHint: "Install Junie with `curl -fsSL https://junie.jetbrains.com/install.sh | bash`, then run `bb plugin reload junie`.",
+  installHint: "Install Junie with `curl -fsSL https://junie.jetbrains.com/install.sh | bash` (see https://junie.jetbrains.com/docs/get-started-with-junie.html), then run `bb plugin reload junie`.",
 } as const;
 
 export function isObject(value: unknown): value is JsonObject {

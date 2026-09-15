@@ -23,7 +23,7 @@ describe("managedAgent", () => {
       id: PROFILE.id,
       displayName: PROFILE.displayName,
       command: BINARY,
-      args: ["--acp", "true"],
+      args: ["--acp=true"],
       env: {},
       nativeSkillRoots: {
         user: [".junie/skills"],
@@ -37,7 +37,7 @@ describe("managedAgent", () => {
     const existing: CustomAgent = {
       id: PROFILE.id,
       command: "junie",
-      args: ["--acp", "true", "--banner"],
+      args: ["--acp=true", "--banner"],
       env: { JUNIE_API_KEY: "x" },
       cwd: "/tmp/workspace",
       dialect: "cursor",
@@ -47,7 +47,7 @@ describe("managedAgent", () => {
     expect(agent.dialect).toBe("cursor");
     expect(agent.env).toEqual({ JUNIE_API_KEY: "x" });
     // Fields we manage are rewritten even when the user edited them.
-    expect(agent.args).toEqual(["--acp", "true"]);
+    expect(agent.args).toEqual(["--acp=true"]);
     expect(agent.command).toBe(BINARY);
   });
 

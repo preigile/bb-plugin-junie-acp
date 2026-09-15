@@ -1,15 +1,18 @@
 import { definePluginApp } from "@get-bb/plugin-sdk/app";
 
+// Official Junie mark (JetBrains brand green) from junie-agent/junie-assets.
 function JunieIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 48 48"
-      fill="currentColor"
+      viewBox="0 0 54 53"
+      fill="none"
       className={className}
       aria-hidden="true"
     >
-      <path d="M28 8h8v22a12 12 0 0 1-12 12 12 12 0 0 1-12-12h8a4 4 0 0 0 8 0z" />
+      <path d="M35.4473 17.668H53.1134V20.614C53.1134 41.2261 44.2752 53.0001 20.7273 53.0001H17.7812V35.334H20.7273C31.0282 35.334 35.4473 30.9149 35.4473 20.614V17.668Z" fill="#48E054" />
+      <path d="M17.6661 17.668H0V35.334H17.6661V17.668Z" fill="#48E054" />
+      <path d="M35.334 0H17.668V17.6661H35.334V0Z" fill="#48E054" />
     </svg>
   );
 }

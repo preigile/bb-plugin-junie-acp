@@ -2,6 +2,6 @@
   "id": "junie",
   "displayName": "Junie",
   "command": "junie",
-  "args": ["--acp", "true"],
+  "args": ["--acp=true"],
   "env": {}
 }
