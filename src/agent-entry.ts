@@ -22,10 +22,7 @@ export const PROFILE = {
   // Junie's ACP mode exposes no documented launch flags for bypassing its own
   // permission prompts, so bb's permission modes add nothing and every tool
   // call comes through ACP for approval as usual.
-  permissionCli: {
-    full: [] as string[],
-    workspaceWrite: [] as string[],
-  },
+  // permissionCli is omitted — Junie has no bypass flags.
   installHint: "Install Junie with `curl -fsSL https://junie.jetbrains.com/install.sh | bash` (see https://junie.jetbrains.com/docs/get-started-with-junie.html), then run `bb plugin reload junie`.",
 } as const;
 
@@ -60,7 +57,7 @@ export function stringifyCustomAgents(agents: CustomAgent[]): string {
   return `${JSON.stringify(agents, null, 2)}\n`;
 }
 
-export function managedAgent(binary: string, existing?: CustomAgent): CustomAgent {
+export function managedAgent(binary: string, bridgePath: string, existing?: CustomAgent): CustomAgent {
   const existingEnv = isObject(existing?.env) ? existing.env : {};
   return {
     // Keys the user added themselves (cwd, dialect, modelCli, ...) survive a
@@ -68,16 +65,16 @@ export function managedAgent(binary: string, existing?: CustomAgent): CustomAgen
     ...(existing ?? {}),
     id: PROFILE.id,
     displayName: PROFILE.displayName,
-    command: binary,
-    args: [...PROFILE.args],
-    env: existingEnv,
+    // Point at the bridge proxy; the real Junie binary is passed via JUNIE_BIN
+    command: bridgePath,
+    args: [],
+    env: {
+      ...existingEnv,
+      JUNIE_BIN: binary,
+    },
     nativeSkillRoots: {
       user: [...PROFILE.nativeSkillRoots.user],
       project: [...PROFILE.nativeSkillRoots.project],
-    },
-    permissionCli: {
-      full: [...PROFILE.permissionCli.full],
-      workspaceWrite: [...PROFILE.permissionCli.workspaceWrite],
     },
   };
 }

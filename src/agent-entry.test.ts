@@ -11,6 +11,7 @@ import {
 } from "./agent-entry.js";
 
 const BINARY = "/usr/local/bin/junie";
+const BRIDGE = "/path/to/junie-acp-bridge.mjs";
 
 function otherAgent(id: string): CustomAgent {
   return { id, displayName: id, command: id, args: ["--acp"], env: {} };
@@ -18,18 +19,17 @@ function otherAgent(id: string): CustomAgent {
 
 describe("managedAgent", () => {
   it("declares the fields the plugin owns", () => {
-    const agent = managedAgent(BINARY);
+    const agent = managedAgent(BINARY, BRIDGE);
     expect(agent).toMatchObject({
       id: PROFILE.id,
       displayName: PROFILE.displayName,
-      command: BINARY,
-      args: ["--acp=true"],
-      env: {},
+      command: BRIDGE,
+      args: [],
+      env: { JUNIE_BIN: BINARY },
       nativeSkillRoots: {
         user: [".junie/skills"],
         project: [".junie/skills"],
       },
-      permissionCli: { full: [], workspaceWrite: [] },
     });
   });
 
@@ -42,23 +42,23 @@ describe("managedAgent", () => {
       cwd: "/tmp/workspace",
       dialect: "cursor",
     };
-    const agent = managedAgent(BINARY, existing);
+    const agent = managedAgent(BINARY, BRIDGE, existing);
     expect(agent.cwd).toBe("/tmp/workspace");
     expect(agent.dialect).toBe("cursor");
-    expect(agent.env).toEqual({ JUNIE_API_KEY: "x" });
+    expect(agent.env).toEqual({ JUNIE_API_KEY: "x", JUNIE_BIN: BINARY });
     // Fields we manage are rewritten even when the user edited them.
-    expect(agent.args).toEqual(["--acp=true"]);
-    expect(agent.command).toBe(BINARY);
+    expect(agent.args).toEqual([]);
+    expect(agent.command).toBe(BRIDGE);
   });
 
   it("ignores a non-object env rather than passing it through", () => {
-    expect(managedAgent(BINARY, { id: PROFILE.id, env: "nope" }).env).toEqual({});
+    expect(managedAgent(BINARY, BRIDGE, { id: PROFILE.id, env: "nope" }).env).toEqual({ JUNIE_BIN: BINARY });
   });
 });
 
 describe("findOwnAgent", () => {
   it("finds our entry by id and carries the user's keys", () => {
-    const current = { ...managedAgent(BINARY), cwd: "/current" };
+    const current = { ...managedAgent(BINARY, BRIDGE), cwd: "/current" };
     expect(findOwnAgent([otherAgent("auggie"), current])?.cwd).toBe("/current");
   });
 
@@ -70,30 +70,30 @@ describe("findOwnAgent", () => {
 describe("upsertAgent", () => {
   it("appends the entry and leaves other agents in place", () => {
     const agents = [otherAgent("auggie"), otherAgent("droid")];
-    const result = upsertAgent(agents, managedAgent(BINARY));
+    const result = upsertAgent(agents, managedAgent(BINARY, BRIDGE));
     expect(result.changed).toBe(true);
     expect(result.agents.map((agent) => agent.id)).toEqual(["auggie", "droid", PROFILE.id]);
   });
 
   it("is idempotent once provisioned", () => {
-    const first = upsertAgent([otherAgent("auggie")], managedAgent(BINARY));
-    const second = upsertAgent(first.agents, managedAgent(BINARY));
+    const first = upsertAgent([otherAgent("auggie")], managedAgent(BINARY, BRIDGE));
+    const second = upsertAgent(first.agents, managedAgent(BINARY, BRIDGE));
     expect(second.changed).toBe(false);
     expect(second.agents).toEqual(first.agents);
   });
 
   it("reports a change when the resolved binary moved", () => {
-    const provisioned = upsertAgent([], managedAgent("/opt/homebrew/bin/junie")).agents;
-    const result = upsertAgent(provisioned, managedAgent(BINARY));
+    const provisioned = upsertAgent([], managedAgent("/opt/homebrew/bin/junie", BRIDGE)).agents;
+    const result = upsertAgent(provisioned, managedAgent(BINARY, BRIDGE));
     expect(result.changed).toBe(true);
     expect(result.agents).toHaveLength(1);
-    expect(result.agents[0]?.command).toBe(BINARY);
+    expect(result.agents[0]?.command).toBe(BRIDGE);
   });
 });
 
 describe("removeAgent", () => {
   it("removes our entry and nothing else", () => {
-    const agents = [otherAgent("auggie"), managedAgent(BINARY)];
+    const agents = [otherAgent("auggie"), managedAgent(BINARY, BRIDGE)];
     const result = removeAgent(agents);
     expect(result.changed).toBe(true);
     expect(result.agents).toEqual([otherAgent("auggie")]);
@@ -113,7 +113,7 @@ describe("parseCustomAgents", () => {
   });
 
   it("round-trips what stringifyCustomAgents writes", () => {
-    const agents = [otherAgent("auggie"), managedAgent(BINARY)];
+    const agents = [otherAgent("auggie"), managedAgent(BINARY, BRIDGE)];
     expect(parseCustomAgents(stringifyCustomAgents(agents))).toEqual(agents);
   });
 

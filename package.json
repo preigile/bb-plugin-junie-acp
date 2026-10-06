@@ -38,9 +38,6 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "zod": "^4.3.6"
-  },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.21",
     "@types/better-sqlite3": "^7.6.12",
@@ -48,6 +45,7 @@
     "@types/react": "^19.0.0",
     "hono": "^4.11.9",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.9"
+    "vite": "^7.3.6",
+    "vitest": "^5.0.1"
   }
 }

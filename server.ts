@@ -11,7 +11,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
-import { delimiter, dirname, join } from "node:path";
+import { delimiter, dirname, isAbsolute, join } from "node:path";
 import {
   ACP_PLUGIN_ID,
   PROFILE,
@@ -26,6 +26,7 @@ import {
   type CustomAgent,
   type JsonObject,
 } from "./src/agent-entry.js";
+import { ensureBridgeScript } from "./src/bridge-loader.js";
 
 const SETTINGS_READY_ATTEMPTS = 10;
 const SETTINGS_READY_DELAY_MS = 500;
@@ -40,7 +41,16 @@ function isExecutable(path: string): boolean {
 }
 
 function findBinary(existing?: CustomAgent): string | null {
-  if (typeof existing?.command === "string" && existing.command.includes(delimiter) && isExecutable(existing.command)) {
+  // If we have a stored JUNIE_BIN in env, prefer it (the real binary, not the bridge)
+  const existingEnv = isObject(existing?.env) ? existing.env : {};
+  const storedBin = typeof existingEnv.JUNIE_BIN === "string" ? existingEnv.JUNIE_BIN : undefined;
+  if (storedBin && isAbsolute(storedBin) && isExecutable(storedBin)) {
+    return storedBin;
+  }
+  // If the stored command is the bridge, skip it — we need the real Junie binary
+  if (typeof existing?.command === "string" && existing.command.includes("junie-acp-bridge")) {
+    // Fall through to PATH search for the real `junie` binary
+  } else if (typeof existing?.command === "string" && isAbsolute(existing.command) && isExecutable(existing.command)) {
     return existing.command;
   }
   const names = process.platform === "win32"
@@ -152,7 +162,9 @@ export default function plugin(bb: BbPluginApi) {
     const binary = findBinary(existing);
     if (binary === null) throw new Error(`${PROFILE.binary} was not found. ${PROFILE.installHint}`);
 
-    const managed = managedAgent(binary, existing);
+    // Ensure the bridge script is available at runtime
+    const bridgePath = ensureBridgeScript();
+    const managed = managedAgent(binary, bridgePath, existing);
     let changed = false;
 
     if (settingAgents !== null) {
