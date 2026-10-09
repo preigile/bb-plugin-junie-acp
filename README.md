@@ -4,7 +4,7 @@ Adds [JetBrains Junie](https://junie.jetbrains.com/) CLI to [bb](https://getbb.a
 
 After installation, **Junie** appears in bb as provider **`acp-junie`**.
 
-The npm package is `bb-plugin-junie-acp` and the plugin id is `junie`. The plugin
+The npm package is `bb-plugin-junie` and the plugin id is `junie`. The plugin
 locates the `junie` CLI and drives it in its native ACP mode (`junie --acp=true`)
 over stdio, registering a managed entry in bb's built-in ACP providers plugin
 without disturbing other agents. The launch command matches the JetBrains entry
